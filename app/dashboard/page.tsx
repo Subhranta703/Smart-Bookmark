@@ -12,46 +12,58 @@ interface Bookmark {
 
 export default function Dashboard() {
   const router = useRouter();
-
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // 🔐 Protect dashboard first
-useEffect(() => {
-  const checkSession = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) router.push("/"); // redirect if not logged in
-  };
-  checkSession();
-}, [router]);
+  useEffect(() => {
+    let channel: any;
 
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
 
-  const fetchBookmarks = async () => {
-    const { data } = await supabase
-      .from("bookmarks")
-      .select("*")
-      .order("created_at", { ascending: false });
+      if (!session) {
+        router.push("/");
+        return;
+      }
 
-    setBookmarks(data || []);
-  };
+      const { data } = await supabase
+        .from("bookmarks")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-  const setupRealtime = () => {
-    const channel = supabase
-      .channel("realtime bookmarks")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "bookmarks" },
-        () => fetchBookmarks()
-      )
-      .subscribe();
+      setBookmarks(data || []);
+
+      channel = supabase
+        .channel("bookmarks")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "bookmarks" },
+          async () => {
+            const { data } = await supabase
+              .from("bookmarks")
+              .select("*")
+              .order("created_at", { ascending: false });
+
+            setBookmarks(data || []);
+          }
+        )
+        .subscribe();
+
+      setLoading(false);
+    };
+
+    init();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
-  };
+  }, [router]);
 
   const addBookmark = async () => {
+    if (!title || !url) return;
+
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -71,46 +83,58 @@ useEffect(() => {
     await supabase.from("bookmarks").delete().eq("id", id);
   };
 
+  const logout = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
+
+  if (loading) return <div className="text-center mt-10">Loading...</div>;
+
   return (
-    <div className="max-w-xl mx-auto mt-10 space-y-4">
-      <h1 className="text-2xl font-bold">My Bookmarks</h1>
+    <div className="max-w-xl mx-auto mt-10 space-y-6">
+      <div className="flex justify-between">
+        <h1 className="text-2xl font-bold">My Bookmarks</h1>
+        <button onClick={logout} className="text-red-500">
+          Logout
+        </button>
+      </div>
 
       <div className="flex gap-2">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Title"
-          className="border p-2 flex-1"
+          className="border p-2 flex-1 rounded"
         />
         <input
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="URL"
-          className="border p-2 flex-1"
+          className="border p-2 flex-1 rounded"
         />
         <button
           onClick={addBookmark}
-          className="bg-green-600 text-white px-4"
+          className="bg-green-600 text-white px-4 rounded"
         >
           Add
         </button>
       </div>
 
-      {bookmarks.map((bookmark) => (
+      {bookmarks.map((b) => (
         <div
-          key={bookmark.id}
-          className="flex justify-between items-center border p-2 rounded"
+          key={b.id}
+          className="flex justify-between items-center border p-3 rounded"
         >
           <a
-            href={bookmark.url}
+            href={b.url}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600"
           >
-            {bookmark.title}
+            {b.title}
           </a>
           <button
-            onClick={() => deleteBookmark(bookmark.id)}
+            onClick={() => deleteBookmark(b.id)}
             className="text-red-500"
           >
             Delete
