@@ -41,7 +41,7 @@ All data isolation is enforced at the database layer.
 Supabase Realtime listens to database changes and updates the UI instantly across open sessions.
 
 📸 Preview
-<p align="center"> <img src="./public/screenshot.png" width="800" /> </p>
+<p align="center"> <img src="./public/Screenshot 2026-02-13 204701.png" width="800" /> </p>
 👨‍💻 Author
 
 Subhranta Kumar
