@@ -90,57 +90,94 @@ export default function Dashboard() {
 
   if (loading) return <div className="text-center mt-10">Loading...</div>;
 
-  return (
-    <div className="max-w-xl mx-auto mt-10 space-y-6">
-      <div className="flex justify-between">
-        <h1 className="text-2xl font-bold">My Bookmarks</h1>
-        <button onClick={logout} className="text-red-500">
-          Logout
-        </button>
-      </div>
-
-      <div className="flex gap-2">
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Title"
-          className="border p-2 flex-1 rounded"
-        />
-        <input
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="URL"
-          className="border p-2 flex-1 rounded"
-        />
-        <button
-          onClick={addBookmark}
-          className="bg-green-600 text-white px-4 rounded"
-        >
-          Add
-        </button>
-      </div>
-
-      {bookmarks.map((b) => (
-        <div
-          key={b.id}
-          className="flex justify-between items-center border p-3 rounded"
-        >
-          <a
-            href={b.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600"
-          >
-            {b.title}
-          </a>
+return (
+  <div className="min-h-screen bg-black text-white flex flex-col">
+    
+    {/* Main Content */}
+    <div className="flex-1">
+      <div className="max-w-2xl mx-auto px-6 py-14 space-y-10">
+        
+        {/* Header */}
+        <div className="flex justify-between items-center border-b border-white/10 pb-4">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            My Bookmarks
+          </h1>
           <button
-            onClick={() => deleteBookmark(b.id)}
-            className="text-red-500"
+            onClick={logout}
+            className="text-sm border border-white/20 px-4 py-1.5 rounded-md hover:bg-white hover:text-black transition-all duration-200"
           >
-            Delete
+            Logout
           </button>
         </div>
-      ))}
+
+        {/* Add Form */}
+        <div className="flex gap-3">
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Title"
+            className="bg-black border border-white/20 px-4 py-2 rounded-md flex-1 focus:outline-none focus:border-white transition"
+          />
+          <input
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="URL"
+            className="bg-black border border-white/20 px-4 py-2 rounded-md flex-1 focus:outline-none focus:border-white transition"
+          />
+          <button
+            onClick={addBookmark}
+            className="border border-white px-5 py-2 rounded-md hover:bg-white hover:text-black transition-all duration-200"
+          >
+            Add
+          </button>
+        </div>
+
+        {/* Bookmark List */}
+        <div className="space-y-4">
+          {bookmarks.length === 0 && (
+            <p className="text-white/40 text-sm">
+              No bookmarks added yet.
+            </p>
+          )}
+
+          {bookmarks.map((b) => (
+            <div
+              key={b.id}
+              className="flex justify-between items-center border border-white/10 px-4 py-3 rounded-md hover:border-white/30 transition"
+            >
+              <a
+                href={b.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:underline"
+              >
+                {b.title}
+              </a>
+
+              <button
+                onClick={() => deleteBookmark(b.id)}
+                className="text-white/60 hover:text-white transition text-sm"
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
-  );
+
+    {/* Footer */}
+    <footer className="border-t border-white/10 py-6">
+      <div className="max-w-2xl mx-auto px-6 text-center text-sm text-white/50">
+        <p>
+          Built by <span className="text-white font-medium">Subhranta Kumar</span>
+        </p>
+        <p className="mt-1">
+          Fullstack Developer · React · Next.js · Supabase
+        </p>
+      </div>
+    </footer>
+
+  </div>
+);
 }
