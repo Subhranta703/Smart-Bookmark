@@ -31,7 +31,7 @@ https://smart-bookmark-vert.vercel.app
 
 Row-Level Security ensures users can only access their own bookmarks:
 
-```sql
+sql
 using (auth.uid() = user_id);
 
 All data isolation is enforced at the database layer.
@@ -41,20 +41,11 @@ All data isolation is enforced at the database layer.
 Supabase Realtime listens to database changes and updates the UI instantly across open sessions.
 
 📸 Preview
-<p align="center"> <img src="./public/Screenshot 2026-02-13 204701.png" width="800" /> </p>
+<p align="center"> <img src="./public/Screenshot.png" width="800" /> </p>
 👨‍💻 Author
 
 Subhranta Kumar
 Fullstack Developer
 
 
----
 
-# 📌 Important
-
-Your live link should NOT include `/dashboard`.
-
-Use:
-
-
-https://smart-bookmark-vert.vercel.app
